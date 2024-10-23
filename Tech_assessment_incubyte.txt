@@ -1,0 +1,45 @@
+CREATE TABLE Customer (
+    Customer_Name VARCHAR(255) NOT NULL,
+    Customer_ID VARCHAR(18) NOT NULL PRIMARY KEY,
+    Open_Date DATE NOT NULL,
+    Last_Consulted_Date DATE,
+    Vaccination_Type CHAR(5),
+    Doctor_Consulted VARCHAR(255),
+    State CHAR(5),
+    Country CHAR(5),
+    Post_Code INT,
+    Date_of_Birth DATE,
+    Active_Customer CHAR(1)
+);
+
+CREATE TABLE Table_India AS 
+SELECT * FROM Customer WHERE Country = 'IND';
+
+--Adding derived columns:
+
+ALTER TABLE Customer ADD Age INT;
+ALTER TABLE Customer ADD Days_Since_Last_Consulted INT;
+
+UPDATE Customer SET Age = FLOOR(DATEDIFF(day, Date_of_Birth, GETDATE()) / 365.25);
+UPDATE Customer SET Days_Since_Last_Consulted = DATEDIFF(day, Last_Consulted_Date, GETDATE());
+
+--For Validations we can use below queries:
+
+-- Check mandatory fields
+SELECT * FROM Customer 
+WHERE Customer_Name IS NULL 
+OR Customer_ID IS NULL 
+OR Open_Date IS NULL 
+OR Active_Customer IS NULL;
+
+-- Check data types and length
+SELECT * FROM Customer 
+WHERE LEN(Customer_ID) > 18 
+OR LEN(Vaccination_Type) > 5 
+OR LEN(State) > 5 
+OR LEN(Country) > 5 
+OR LEN(Active_Customer) > 1;
+
+-- Calculate Days_Since_Last_Consulted only if Last_Consulted_Date is not NULL
+UPDATE Customer SET Days_Since_Last_Consulted = DATEDIFF(day, Last_Consulted_Date, GETDATE())
+WHERE Last_Consulted_Date IS NOT NULL;
